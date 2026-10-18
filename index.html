@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Naughty Ferrets — Join the Mischief</title>
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #5c5c5c;
+      --accent: #2c5f4a;
+      --accent-hover: #1e4435;
+      --border: #e5e2db;
+      --paper: #fdfbf7;
+      --nb-bg: #d3d3d3;
+      --nb-ink: #323232;
+      --nb-sub: #555;
+      --nb-field: #ffffff;
+      --nb-focus: #2d8cf0;
+      --font-heading: "Dela Gothic One", "Arial Black", Impact, system-ui, sans-serif;
+      --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #f3f1ec;
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+    .container { width: 100%; max-width: 540px; }
+    header { text-align: center; margin-bottom: 28px; }
+    .logo {
+      font-family: var(--font-heading);
+      font-weight: 400;
+      color: var(--nb-ink);
+      font-size: 1.5rem;
+      letter-spacing: 0;
+      margin-bottom: 6px;
+    }
+    .tagline {
+      font-family: var(--font-mono);
+      color: var(--nb-sub);
+      font-size: 0.9rem;
+    }
+    .card {
+      background: var(--nb-bg);
+      border: 2px solid var(--nb-ink);
+      border-radius: 5px;
+      padding: 32px 28px;
+      box-shadow: 4px 4px var(--nb-ink);
+    }
+    h1, .result h2 {
+      font-family: var(--font-heading);
+      font-weight: 400;
+      color: var(--nb-ink);
+      letter-spacing: 0;
+      line-height: 1.25;
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+    .intro, .result p {
+      font-family: var(--font-mono);
+      color: var(--nb-sub);
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-bottom: 26px;
+    }
+    label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--nb-ink);
+    }
+    .required::after { content: " *"; color: #c0392b; font-weight: 400; }
+    input, textarea, select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 2px solid var(--nb-ink);
+      border-radius: 5px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--nb-field);
+      box-shadow: 4px 4px var(--nb-ink);
+      font-weight: 600;
+      color: var(--nb-ink);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      margin-bottom: 16px;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      background: var(--nb-field);
+      border-color: var(--nb-ink);
+      box-shadow: 4px 4px var(--nb-focus);
+    }
+    input.invalid, textarea.invalid, select.invalid {
+      border-color: #b3261e;
+      box-shadow: 4px 4px #b3261e;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .phone-group { display: flex; gap: 8px; margin-bottom: 16px; }
+    .phone-group select { width: 210px; flex-shrink: 0; margin-bottom: 0; font-size: 0.9rem; }
+    .phone-group input { flex: 1; margin-bottom: 0; }
+    .location-group { display: flex; gap: 8px; margin-bottom: 16px; }
+    .location-group input { flex: 1; margin-bottom: 0; }
+    .location-group select { width: 180px; flex-shrink: 0; margin-bottom: 0; font-size: 0.9rem; }
+    .file-wrap {
+      border: 2px dashed var(--nb-ink);
+      border-radius: 5px;
+      padding: 16px;
+      text-align: center;
+      background: var(--nb-field);
+      box-shadow: 4px 4px var(--nb-ink);
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .file-wrap:hover, .file-wrap.dragover { border-color: var(--nb-ink); background: #eef5ff; }
+    .file-wrap input[type="file"] { display: none; }
+    .file-label { font-size: 0.9rem; color: var(--nb-ink); font-weight: 600; }
+    .file-name { font-size: 0.85rem; color: var(--nb-focus); margin-top: 6px; font-weight: 500; }
+    .hint {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: -10px;
+      margin-bottom: 14px;
+    }
+    #form-error {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #c0392b;
+      font-size: 0.85rem;
+      margin: 6px 0 0;
+      display: none;
+    }
+    #dob-msg {
+      margin: -12px 0 16px;
+      color: #b3261e;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      display: none;
+    }
+    .dob-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .dob-row input { width: 74px; margin: 0; text-align: center; padding: 9px 6px; }
+    .dob-row #dob-year { width: 104px; }
+    .dob-row span { font-family: var(--font-mono); font-weight: 700; color: var(--nb-ink); }
+    .label-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+    .label-row label { margin-bottom: 0; }
+    .fmt {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #777;
+      letter-spacing: 0.04em;
+    }
+
+    /* Submit button */
+    .plain-btn {
+      display: block;
+      width: 250px;
+      max-width: 100%;
+      margin: 14px auto 0;
+      padding: 11px 0;
+      min-width: 0;
+      background: #7ddba8;
+      color: var(--nb-ink);
+      text-shadow: none;
+      filter: none;
+      border: 2px solid var(--nb-ink);
+      border-radius: 5px;
+      box-shadow: 4px 4px var(--nb-ink);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0;
+      overflow: hidden;
+      z-index: 1;
+      position: relative;
+      cursor: pointer;
+      transition: color 250ms, transform 120ms, box-shadow 120ms;
+      font-family: inherit;
+    }
+    .plain-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0;
+      background: #212121;
+      z-index: -1;
+      transition: width 250ms;
+    }
+    .plain-btn:hover { filter: none; color: #e8e8e8; }
+    .plain-btn:hover::before { width: 100%; }
+    .plain-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px var(--nb-ink); }
+    .plain-btn:disabled { opacity: 0.65; cursor: wait; }
+
+    /* Next button */
+    .next-wrap {
+      position: relative;
+      display: block;
+      width: 250px;
+      max-width: 100%;
+      margin: 30px auto 0;
+    }
+    .uiverse {
+      --duration: 7s;
+      --easing: linear;
+      --c-color-1: rgba(255, 138, 30, 0.95);
+      --c-color-2: #ff5c7a;
+      --c-color-3: #ff8f3d;
+      --c-color-4: rgba(255, 214, 10, 0.95);
+      --c-shadow: rgba(255, 170, 60, 0.5);
+      --c-shadow-inset-top: rgba(255, 190, 70, 0.9);
+      --c-shadow-inset-bottom: rgba(255, 240, 200, 0.8);
+      --c-radial-inner: #ffb21a;
+      --c-radial-outer: #ffe27a;
+      --c-color: #323232;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-appearance: none;
+      outline: none;
+      position: relative;
+      cursor: pointer;
+      border: 2px solid var(--nb-ink);
+      border-radius: 5px;
+      box-shadow: 4px 4px var(--nb-ink);
+      width: 100%;
+      display: block;
+      text-shadow: none;
+      font-weight: 700;
+      letter-spacing: 0;
+      padding: 0;
+      text-align: center;
+      font-family: inherit;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--c-color);
+      background: radial-gradient(circle, var(--c-radial-inner), var(--c-radial-outer) 80%);
+      transition: transform 120ms, box-shadow 120ms;
+    }
+    .uiverse:before {
+      content: "";
+      pointer-events: none;
+      position: absolute;
+      z-index: 3;
+      left: 0; top: 0; right: 0; bottom: 0;
+      border-radius: 3px;
+      box-shadow: none;
+    }
+    .uiverse .wrapper {
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+      overflow: hidden;
+      border-radius: 3px;
+      min-width: 0;
+      width: 100%;
+      padding: 11px 0;
+    }
+    .uiverse .wrapper span { display: inline-block; position: relative; z-index: 1; }
+    .uiverse:hover { --duration: 1400ms; }
+    .uiverse:active { transform: translate(2px, 2px); box-shadow: 2px 2px var(--nb-ink); }
+    .uiverse .wrapper .blobs {
+      position: absolute;
+      left: 0; top: 0;
+      width: 150px;
+      height: 100%;
+      transform: scaleX(1.64);
+      transform-origin: 0 0;
+    }
+    .uiverse .wrapper .circle {
+      position: absolute;
+      left: 0; top: 0;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      filter: blur(var(--blur, 8px));
+      background: var(--background, transparent);
+      transform: translate(var(--x, 0), var(--y, 0)) translateZ(0);
+      animation: var(--animation, none) var(--duration) var(--easing) infinite;
+    }
+    .uiverse .wrapper .circle-1, .uiverse .wrapper .circle-9, .uiverse .wrapper .circle-10 { --background: var(--c-color-4); }
+    .uiverse .wrapper .circle-3, .uiverse .wrapper .circle-4 { --background: var(--c-color-2); --blur: 14px; }
+    .uiverse .wrapper .circle-5, .uiverse .wrapper .circle-6 { --background: var(--c-color-3); --blur: 16px; }
+    .uiverse .wrapper .circle-2, .uiverse .wrapper .circle-7, .uiverse .wrapper .circle-8,
+    .uiverse .wrapper .circle-11, .uiverse .wrapper .circle-12 { --background: var(--c-color-1); --blur: 12px; }
+    .uiverse .wrapper .circle-1  { --x: 0;    --y: -40px; --animation: circle-1; }
+    .uiverse .wrapper .circle-2  { --x: 92px; --y: 8px;   --animation: circle-2; }
+    .uiverse .wrapper .circle-3  { --x: -12px;--y: -12px; --animation: circle-3; }
+    .uiverse .wrapper .circle-4  { --x: 80px; --y: -12px; --animation: circle-4; }
+    .uiverse .wrapper .circle-5  { --x: 12px; --y: -4px;  --animation: circle-5; }
+    .uiverse .wrapper .circle-6  { --x: 56px; --y: 16px;  --animation: circle-6; }
+    .uiverse .wrapper .circle-7  { --x: 8px;  --y: 28px;  --animation: circle-7; }
+    .uiverse .wrapper .circle-8  { --x: 28px; --y: -4px;  --animation: circle-8; }
+    .uiverse .wrapper .circle-9  { --x: 20px; --y: -12px; --animation: circle-9; }
+    .uiverse .wrapper .circle-10 { --x: 64px; --y: 16px;  --animation: circle-10; }
+    .uiverse .wrapper .circle-11 { --x: 4px;  --y: 4px;   --animation: circle-11; }
+    .uiverse .wrapper .circle-12 { --blur: 14px; --x: 52px; --y: 4px; --animation: circle-12; }
+    @keyframes circle-1  { 33% { transform: translate(0px, 16px) translateZ(0); }  66% { transform: translate(12px, 64px) translateZ(0); } }
+    @keyframes circle-2  { 33% { transform: translate(80px, -10px) translateZ(0); } 66% { transform: translate(72px, -48px) translateZ(0); } }
+    @keyframes circle-3  { 33% { transform: translate(20px, 12px) translateZ(0); }  66% { transform: translate(12px, 4px) translateZ(0); } }
+    @keyframes circle-4  { 33% { transform: translate(76px, -12px) translateZ(0); } 66% { transform: translate(112px, -8px) translateZ(0); } }
+    @keyframes circle-5  { 33% { transform: translate(84px, 28px) translateZ(0); }  66% { transform: translate(40px, -32px) translateZ(0); } }
+    @keyframes circle-6  { 33% { transform: translate(28px, -16px) translateZ(0); } 66% { transform: translate(76px, -56px) translateZ(0); } }
+    @keyframes circle-7  { 33% { transform: translate(8px, 28px) translateZ(0); }   66% { transform: translate(20px, -60px) translateZ(0); } }
+    @keyframes circle-8  { 33% { transform: translate(32px, -4px) translateZ(0); }  66% { transform: translate(56px, -20px) translateZ(0); } }
+    @keyframes circle-9  { 33% { transform: translate(20px, -12px) translateZ(0); } 66% { transform: translate(80px, -8px) translateZ(0); } }
+    @keyframes circle-10 { 33% { transform: translate(68px, 20px) translateZ(0); }  66% { transform: translate(100px, 28px) translateZ(0); } }
+    @keyframes circle-11 { 33% { transform: translate(4px, 4px) translateZ(0); }    66% { transform: translate(68px, 20px) translateZ(0); } }
+    @keyframes circle-12 { 33% { transform: translate(56px, 0px) translateZ(0); }   66% { transform: translate(60px, -32px) translateZ(0); } }
+
+    /* Butterflies */
+    .butterflies { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+    .bfly {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: var(--size, 26px);
+      height: calc(var(--size, 26px) * 0.75);
+      margin: calc(var(--size, 26px) * -0.375) 0 0 calc(var(--size, 26px) * -0.5);
+      will-change: transform;
+      filter: drop-shadow(0 1px 2px rgba(20, 20, 60, 0.45));
+    }
+    .bfly svg { width: 100%; height: 100%; overflow: visible; }
+    .bfly .wl, .bfly .wr {
+      transform-box: fill-box;
+      animation: flap var(--flap, 0.5s) ease-in-out var(--flap-delay, 0s) infinite alternate;
+    }
+    .bfly .wl { transform-origin: 100% 50%; }
+    .bfly .wr { transform-origin: 0% 50%; }
+    @keyframes flap { from { transform: scaleX(1); } to { transform: scaleX(0.42); } }
+    @media (prefers-reduced-motion: reduce) {
+      .bfly .wl, .bfly .wr { animation: none; }
+    }
+
+    .hidden { display: none !important; }
+    .result { text-align: center; padding: 8px 0; }
+    .result h2 { font-size: 1.25rem; margin-bottom: 10px; }
+    .result p { color: var(--muted); font-size: 0.95rem; margin-bottom: 18px; }
+
+    /* Letter card: no outer padding so the GIF sits flush to the top edge */
+    #success-view.card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .letter-wrap {
+      background: var(--paper);
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      position: relative;
+    }
+    .letterhead {
+      position: relative;
+      z-index: 1;
+      margin: 0; /* flush to top of card */
+      background: #000;
+      border-bottom: 2px solid var(--nb-ink);
+      border-radius: 0;
+      overflow: hidden;
+      line-height: 0;
+      display: block;
+    }
+    .letterhead img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      vertical-align: top;
+    }
+    /* Real scanned handwritten page — photo, not AI text */
+    .letter-photo {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      vertical-align: top;
+      background: #fff;
+    }
+    .note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
+      padding: 16px 24px 24px;
+      border-top: 2px solid var(--nb-ink);
+      font-family: var(--font-mono);
+    }
+    footer {
+      margin-top: 36px;
+      font-size: 0.78rem;
+      color: #777;
+      text-align: center;
+      font-family: var(--font-mono);
+    }
+    input[type="email"] { text-transform: lowercase; }
+    .letter-title {
+      display: none;
+      font-family: var(--font-heading);
+      font-weight: 400;
+      font-size: 1.6rem;
+      line-height: 1.3;
+      color: var(--nb-ink);
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    body.letter-mode .logo,
+    body.letter-mode .tagline { display: none; }
+    body.letter-mode .letter-title { display: block; }
+
+    /* Loading gate so letter never flashes before assets are ready */
+    #page-gate {
+      position: fixed;
+      inset: 0;
+      background: #f3f1ec;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      color: var(--nb-sub);
+      font-size: 0.9rem;
+      transition: opacity 0.25s ease;
+    }
+    #page-gate.ready {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="page-gate">Loading…</div>
+
+  <div class="container">
+    <header>
+      <div class="logo">🐾 Naughty Ferrets</div>
+      <div class="tagline">Mischievous games, made by a small crew.</div>
+      <h2 class="letter-title">The first mischievous game that we’re playing is you</h2>
+    </header>
+
+    <div id="form-view" class="card">
+      <h1>Join the mischief</h1>
+      <p class="intro">We’re Naughty Ferrets, a small studio making mischievous games, and we’re opening a few early conversations. Short form, no long application, no commitment — just a way to see if a conversation makes sense.</p>
+
+      <form id="interest-form" novalidate>
+        <!-- Honeypot spam trap -->
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"
+               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+
+        <label for="full-name" class="required">Full name</label>
+        <input type="text" id="full-name" name="full-name" required autocomplete="name" maxlength="120" />
+
+        <label for="email" class="required">Email</label>
+        <input type="email" id="email" name="email" required placeholder="Where we can reach you"
+               autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="200" />
+
+        <label class="required">Phone number</label>
+        <div class="phone-group">
+          <select id="country-code" name="country-code" aria-label="Country code"></select>
+          <input type="tel" id="phone" name="phone" required placeholder="9123 4567"
+                 autocomplete="tel-national" maxlength="30" />
+        </div>
+
+        <div class="label-row">
+          <label class="required" for="dob-day">Date of birth</label>
+          <span class="fmt">DD/MM/YYYY</span>
+        </div>
+        <div class="dob-row">
+          <input type="text" id="dob-day" inputmode="numeric" maxlength="2" placeholder="DD"
+                 autocomplete="off" aria-label="Day" />
+          <span>/</span>
+          <input type="text" id="dob-month" inputmode="numeric" maxlength="2" placeholder="MM"
+                 autocomplete="off" aria-label="Month" />
+          <span>/</span>
+          <input type="text" id="dob-year" inputmode="numeric" maxlength="4" placeholder="YYYY"
+                 autocomplete="off" aria-label="Year" />
+        </div>
+        <div class="hint" id="dob-msg" role="status"></div>
+
+        <label for="city">Current location</label>
+        <div class="location-group">
+          <input type="text" id="city" name="city" placeholder="City" autocomplete="address-level2" maxlength="80" />
+          <select id="country" name="country" aria-label="Country">
+            <option value="">Country…</option>
+          </select>
+        </div>
+
+        <label for="linkedin">LinkedIn URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="linkedin" name="linkedin" placeholder="linkedin.com/in/… or www.linkedin.com/in/…" maxlength="300" autocomplete="off" />
+
+        <label for="portfolio">Portfolio / website <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="portfolio" name="portfolio" placeholder="www.yoursite.com or https://…" maxlength="300" autocomplete="off" />
+
+        <label>Resume / CV</label>
+        <div class="file-wrap" id="file-drop">
+          <input type="file" id="resume" name="resume"
+                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          <div class="file-label">Click or drag to upload PDF / Word</div>
+          <div class="file-name" id="file-name"></div>
+        </div>
+
+        <label for="experience">Years of relevant experience</label>
+        <select id="experience" name="experience">
+          <option value="">Select…</option>
+          <option value="0-1">0–1 years</option>
+          <option value="1-3">1–3 years</option>
+          <option value="3-5">3–5 years</option>
+          <option value="5+">5+ years</option>
+        </select>
+
+        <label for="note">Anything you’d like us to know? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea id="note" name="note" placeholder="Role interest, timeline, availability, or just say hi..." maxlength="2000"></textarea>
+
+        <div id="form-error" role="alert"></div>
+
+        <button type="submit" id="submit-btn" class="plain-btn">Submit interest</button>
+
+        <div id="next-wrap" class="next-wrap hidden">
+          <button type="button" id="next-btn" class="uiverse">
+            <div class="wrapper">
+              <span>Next</span>
+              <div class="blobs">
+                <div class="circle circle-12"></div>
+                <div class="circle circle-11"></div>
+                <div class="circle circle-10"></div>
+                <div class="circle circle-9"></div>
+                <div class="circle circle-8"></div>
+                <div class="circle circle-7"></div>
+                <div class="circle circle-6"></div>
+                <div class="circle circle-5"></div>
+                <div class="circle circle-4"></div>
+                <div class="circle circle-3"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-1"></div>
+              </div>
+            </div>
+          </button>
+          <div class="butterflies" id="butterflies" aria-hidden="true"></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Normal applicants see this. No way back to the form. -->
+    <div id="thanks-view" class="card result hidden">
+      <h2>Thank you</h2>
+      <p>
+        We’ve received your details. We’ll review everything carefully and reach out if there’s a potential fit.
+        <br><br>
+        No further action needed on your side.
+      </p>
+    </div>
+
+    <!-- Only the matched person ever sees this (this visit). Letter is a real handwritten scan. -->
+    <div id="success-view" class="card result hidden">
+      <div class="letter-wrap">
+        <div class="letterhead">
+          <img id="letterhead-img" alt="This action will have consequences…" src="letterhead.gif" />
+        </div>
+        <img class="letter-photo" src="letter-photo.jpg" alt="Handwritten letter" width="1400" height="1909" />
+      </div>
+      <p class="note">
+        This page was only meant for you. If the timing isn’t right, feel free to walk away.
+        The choice is entirely yours.
+      </p>
+    </div>
+
+    <footer>Naughty Ferrets · Game studio</footer>
+  </div>
+
+  <script>
+    // ========== CONFIGURE THESE ==========
+    const TARGET_NAME  = "May Shin Thant";
+    const TARGET_DOB   = "2005-03-03";            // YYYY-MM-DD
+    const TARGET_EMAIL = "mayshinthant632@gmail.com";
+    // =====================================
+    // Letter content is the real scanned photo: letter-photo.jpg (not AI text)
+
+    const LETTER_UNLOCK_KEY = "nf-letter-unlocked-v1";
+    const LETTER_SOUND_URL  = "choices.mp3";     // keep in same folder; only fetched for the match
+
+    const formView    = document.getElementById("form-view");
+    const thanksView  = document.getElementById("thanks-view");
+    const successView = document.getElementById("success-view");
+    const form        = document.getElementById("interest-form");
+    const fileInput   = document.getElementById("resume");
+    const fileDrop    = document.getElementById("file-drop");
+    const fileNameEl  = document.getElementById("file-name");
+    const errorEl     = document.getElementById("form-error");
+    const pageGate    = document.getElementById("page-gate");
+
+    // ---------- Countries ----------
+    const COUNTRIES = "AF|93|Afghanistan;AX|358|Åland Islands;AL|355|Albania;DZ|213|Algeria;AS|1|American Samoa;AD|376|Andorra;AO|244|Angola;AI|1|Anguilla;AG|1|Antigua and Barbuda;AR|54|Argentina;AM|374|Armenia;AW|297|Aruba;AU|61|Australia;AT|43|Austria;AZ|994|Azerbaijan;BS|1|Bahamas;BH|973|Bahrain;BD|880|Bangladesh;BB|1|Barbados;BY|375|Belarus;BE|32|Belgium;BZ|501|Belize;BJ|229|Benin;BM|1|Bermuda;BT|975|Bhutan;BO|591|Bolivia;BA|387|Bosnia and Herzegovina;BW|267|Botswana;BR|55|Brazil;IO|246|British Indian Ocean Territory;VG|1|British Virgin Islands;BN|673|Brunei;BG|359|Bulgaria;BF|226|Burkina Faso;BI|257|Burundi;KH|855|Cambodia;CM|237|Cameroon;CA|1|Canada;CV|238|Cape Verde;BQ|599|Caribbean Netherlands;KY|1|Cayman Islands;CF|236|Central African Republic;TD|235|Chad;CL|56|Chile;CN|86|China;CX|61|Christmas Island;CC|61|Cocos (Keeling) Islands;CO|57|Colombia;KM|269|Comoros;CG|242|Congo (Republic);CD|243|Congo (DR);CK|682|Cook Islands;CR|506|Costa Rica;CI|225|Côte d'Ivoire;HR|385|Croatia;CU|53|Cuba;CW|599|Curaçao;CY|357|Cyprus;CZ|420|Czechia;DK|45|Denmark;DJ|253|Djibouti;DM|1|Dominica;DO|1|Dominican Republic;EC|593|Ecuador;EG|20|Egypt;SV|503|El Salvador;GQ|240|Equatorial Guinea;ER|291|Eritrea;EE|372|Estonia;SZ|268|Eswatini;ET|251|Ethiopia;FK|500|Falkland Islands;FO|298|Faroe Islands;FJ|679|Fiji;FI|358|Finland;FR|33|France;GF|594|French Guiana;PF|689|French Polynesia;GA|241|Gabon;GM|220|Gambia;GE|995|Georgia;DE|49|Germany;GH|233|Ghana;GI|350|Gibraltar;GR|30|Greece;GL|299|Greenland;GD|1|Grenada;GP|590|Guadeloupe;GU|1|Guam;GT|502|Guatemala;GG|44|Guernsey;GN|224|Guinea;GW|245|Guinea-Bissau;GY|592|Guyana;HT|509|Haiti;HN|504|Honduras;HK|852|Hong Kong;HU|36|Hungary;IS|354|Iceland;IN|91|India;ID|62|Indonesia;IR|98|Iran;IQ|964|Iraq;IE|353|Ireland;IM|44|Isle of Man;IL|972|Israel;IT|39|Italy;JM|1|Jamaica;JP|81|Japan;JE|44|Jersey;JO|962|Jordan;KZ|7|Kazakhstan;KE|254|Kenya;KI|686|Kiribati;XK|383|Kosovo;KW|965|Kuwait;KG|996|Kyrgyzstan;LA|856|Laos;LV|371|Latvia;LB|961|Lebanon;LS|266|Lesotho;LR|231|Liberia;LY|218|Libya;LI|423|Liechtenstein;LT|370|Lithuania;LU|352|Luxembourg;MO|853|Macau;MG|261|Madagascar;MW|265|Malawi;MY|60|Malaysia;MV|960|Maldives;ML|223|Mali;MT|356|Malta;MH|692|Marshall Islands;MQ|596|Martinique;MR|222|Mauritania;MU|230|Mauritius;YT|262|Mayotte;MX|52|Mexico;FM|691|Micronesia;MD|373|Moldova;MC|377|Monaco;MN|976|Mongolia;ME|382|Montenegro;MS|1|Montserrat;MA|212|Morocco;MZ|258|Mozambique;MM|95|Myanmar;NA|264|Namibia;NR|674|Nauru;NP|977|Nepal;NL|31|Netherlands;NC|687|New Caledonia;NZ|64|New Zealand;NI|505|Nicaragua;NE|227|Niger;NG|234|Nigeria;NU|683|Niue;NF|672|Norfolk Island;KP|850|North Korea;MK|389|North Macedonia;MP|1|Northern Mariana Islands;NO|47|Norway;OM|968|Oman;PK|92|Pakistan;PW|680|Palau;PS|970|Palestine;PA|507|Panama;PG|675|Papua New Guinea;PY|595|Paraguay;PE|51|Peru;PH|63|Philippines;PL|48|Poland;PT|351|Portugal;PR|1|Puerto Rico;QA|974|Qatar;RE|262|Réunion;RO|40|Romania;RU|7|Russia;RW|250|Rwanda;BL|590|Saint Barthélemy;SH|290|Saint Helena;KN|1|Saint Kitts and Nevis;LC|1|Saint Lucia;MF|590|Saint Martin;PM|508|Saint Pierre and Miquelon;VC|1|Saint Vincent and the Grenadines;WS|685|Samoa;SM|378|San Marino;ST|239|São Tomé and Príncipe;SA|966|Saudi Arabia;SN|221|Senegal;RS|381|Serbia;SC|248|Seychelles;SL|232|Sierra Leone;SG|65|Singapore;SX|1|Sint Maarten;SK|421|Slovakia;SI|386|Slovenia;SB|677|Solomon Islands;SO|252|Somalia;ZA|27|South Africa;KR|82|South Korea;SS|211|South Sudan;ES|34|Spain;LK|94|Sri Lanka;SD|249|Sudan;SR|597|Suriname;SJ|47|Svalbard and Jan Mayen;SE|46|Sweden;CH|41|Switzerland;SY|963|Syria;TW|886|Taiwan;TJ|992|Tajikistan;TZ|255|Tanzania;TH|66|Thailand;TL|670|Timor-Leste;TG|228|Togo;TK|690|Tokelau;TO|676|Tonga;TT|1|Trinidad and Tobago;TN|216|Tunisia;TR|90|Turkey;TM|993|Turkmenistan;TC|1|Turks and Caicos Islands;TV|688|Tuvalu;UG|256|Uganda;UA|380|Ukraine;AE|971|United Arab Emirates;GB|44|United Kingdom;US|1|United States;UY|598|Uruguay;VI|1|US Virgin Islands;UZ|998|Uzbekistan;VU|678|Vanuatu;VA|39|Vatican City;VE|58|Venezuela;VN|84|Vietnam;WF|681|Wallis and Futuna;EH|212|Western Sahara;YE|967|Yemen;ZM|260|Zambia;ZW|263|Zimbabwe";
+    const DEFAULT_COUNTRY = "SG";
+    const countrySelect = document.getElementById("country-code");
+    const locationCountrySelect = document.getElementById("country");
+    COUNTRIES.split(";").forEach(row => {
+      const [iso, dial, name] = row.split("|");
+      const flag = String.fromCodePoint(...[...iso].map(c => 127397 + c.charCodeAt(0)));
+      // Phone country code dropdown
+      const phoneOpt = document.createElement("option");
+      phoneOpt.value = iso;
+      phoneOpt.dataset.dial = "+" + dial;
+      phoneOpt.textContent = `${flag} ${name} (+${dial})`;
+      countrySelect.appendChild(phoneOpt);
+      // Location country dropdown (name only, no dial code)
+      const locOpt = document.createElement("option");
+      locOpt.value = name;
+      locOpt.dataset.iso = iso;
+      locOpt.textContent = `${flag} ${name}`;
+      locationCountrySelect.appendChild(locOpt);
+    });
+    countrySelect.value = DEFAULT_COUNTRY;
+    // Default location country to same as phone default
+    const defaultName = COUNTRIES.split(";").find(r => r.startsWith(DEFAULT_COUNTRY + "|"));
+    if (defaultName) locationCountrySelect.value = defaultName.split("|")[2];
+
+    // ---------- Email: force lowercase ----------
+    const emailInput = document.getElementById("email");
+    emailInput.addEventListener("input", () => {
+      const v = emailInput.value, lower = v.toLowerCase();
+      if (v !== lower) {
+        const s = emailInput.selectionStart, e = emailInput.selectionEnd;
+        emailInput.value = lower;
+        try { emailInput.setSelectionRange(s, e); } catch (_) {}
+      }
+      clearInvalid(emailInput);
+      updateButton();
+    });
+
+    // ---------- Blue butterflies over the Next button ----------
+    (function () {
+      const holder = document.getElementById("butterflies");
+      const XSTRETCH = 1.35;
+      const PERIOD = 10;
+      const defs = [
+        { c: ["#7dd3fc", "#2563eb"], size: 28, flap: 0.52, A: 67.4, B: 29.8, tilt: -7.5, phase: 3.70, cx: -11.7, cy: 1.5 },
+        { c: ["#93c5fd", "#1d4ed8"], size: 22, flap: 0.42, A: 50.0, B: 29.4, tilt: 17.6, phase: 4.82, cx: -25.4, cy: 5.7 },
+        { c: ["#38bdf8", "#4f46e5"], size: 25, flap: 0.58, A: 64.1, B: 30.0, tilt: -18.0, phase: 4.01, cx: 35.6, cy: 1.3 },
+        { c: ["#bae6fd", "#3b82f6"], size: 18, flap: 0.36, A: 65.7, B: 23.0, tilt: -12.6, phase: 5.13, cx: 25.8, cy: 4.6 },
+        { c: ["#60a5fa", "#6d28d9"], size: 24, flap: 0.48, A: 71.2, B: 30.0, tilt: -5.6, phase: 2.69, cx: 4.4, cy: -1.0 }
+      ];
+      const flies = defs.map((d, i) => {
+        const gid = "bg" + i;
+        const el = document.createElement("div");
+        el.className = "bfly";
+        el.style.cssText = `--size:${d.size}px;--flap:${d.flap}s;--flap-delay:${(-d.flap * (i + 1) / 6).toFixed(2)}s`;
+        el.innerHTML = `<svg viewBox="0 0 40 30" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${d.c[0]}"/><stop offset="1" stop-color="${d.c[1]}"/></linearGradient></defs>
+          <g class="wl"><path d="M20 14C12 1 1 2 3 11c1 6 9 7 17 4z" fill="url(#${gid})"/><path d="M20 15C12 17 6 26 11 27c5 1 8-6 9-11z" fill="url(#${gid})" opacity=".85"/></g>
+          <g class="wr"><path d="M20 14C28 1 39 2 37 11c-1 6-9 7-17 4z" fill="url(#${gid})"/><path d="M20 15C28 17 34 26 29 27c-5 1-8-6-9-11z" fill="url(#${gid})" opacity=".85"/></g>
+          <ellipse cx="20" cy="15" rx="1.4" ry="7" fill="#1e1b4b"/>
+          <path d="M20 8C18 4 16 3 15 2M20 8c2-4 4-5 5-6" stroke="#1e1b4b" stroke-width=".8" fill="none" stroke-linecap="round"/>
+        </svg>`;
+        holder.appendChild(el);
+        return { el, d };
+      });
+
+      function pointOnLoop(d, clock) {
+        const th = 2 * Math.PI * clock / PERIOD + d.phase;
+        const s = Math.sin(th), c = Math.cos(th), k = 1 + s * s;
+        const x = d.A * c / k, y = 2 * d.B * s * c / k, a = d.tilt * Math.PI / 180;
+        return [(x * Math.cos(a) - y * Math.sin(a) + d.cx) * XSTRETCH, x * Math.sin(a) + y * Math.cos(a) + d.cy];
+      }
+
+      const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let last = performance.now(), clock = 0;
+      function frame(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        if (holder.offsetParent !== null) {
+          clock += dt;
+          flies.forEach(f => {
+            const [x, y] = pointOnLoop(f.d, clock);
+            const [x2, y2] = pointOnLoop(f.d, clock + 0.03);
+            const rot = Math.atan2(x2 - x, -(y2 - y)) * 180 / Math.PI;
+            f.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`;
+          });
+        }
+        if (!reduce) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    // ---------- Date of birth ----------
+    const dobBoxes = ["dob-day", "dob-month", "dob-year"].map(id => document.getElementById(id));
+    const dobMsg = document.getElementById("dob-msg");
+    const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const THIS_YEAR = new Date().getFullYear();
+
+    function maxDay(m, y) {
+      const mm = +m;
+      if (!mm || mm < 1 || mm > 12) return 31;
+      if (y.length === 4) return new Date(+y, mm, 0).getDate();
+      return [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mm - 1];
+    }
+    function dobSay(text) {
+      dobMsg.textContent = text || "";
+      dobMsg.style.display = text ? "block" : "none";
+    }
+    function dobFix(keepMessage) {
+      const [d, m, y] = dobBoxes;
+      let note = "";
+      if (m.value.length === 2) {
+        if (+m.value === 0) m.value = "01";
+        if (+m.value > 12) { m.value = "12"; note = "Months go from 01 to 12."; }
+      }
+      if (d.value.length === 2) {
+        const max = maxDay(m.value.length === 2 ? m.value : "", y.value);
+        if (+d.value === 0) d.value = "01";
+        if (+d.value > max) {
+          d.value = String(max).padStart(2, "0");
+          note = m.value.length === 2
+            ? `${MONTH_NAMES[+m.value - 1]}${y.value.length === 4 ? " " + y.value : ""} only has ${max} days.`
+            : "Days go from 01 to 31.";
+        }
+      }
+      if (y.value.length === 4 && (+y.value < 1900 || +y.value > THIS_YEAR)) {
+        note = `Year must be between 1900 and ${THIS_YEAR}.`;
+      }
+      if (note || !keepMessage) dobSay(note);
+    }
+    function padBox(i) {
+      const box = dobBoxes[i];
+      if (i < 2 && box.value.length === 1) box.value = box.value === "0" ? "" : "0" + box.value;
+    }
+    dobBoxes.forEach((box, i) => {
+      box.addEventListener("input", () => {
+        box.value = box.value.replace(/\D/g, "");
+        if (i < 2 && box.value.length === 1 && +box.value > 0) {
+          const limit = i === 0
+            ? Math.floor(maxDay(dobBoxes[1].value.length === 2 ? dobBoxes[1].value : "", dobBoxes[2].value) / 10)
+            : 1;
+          if (+box.value > limit) box.value = "0" + box.value;
+        }
+        dobFix();
+        if (i < 2 && box.value.length === 2) dobBoxes[i + 1].focus();
+        clearInvalid(box);
+        updateButton();
+      });
+      box.addEventListener("blur", () => { padBox(i); dobFix(true); updateButton(); });
+      box.addEventListener("change", updateButton);
+      box.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && box.value === "" && i > 0) {
+          e.preventDefault();
+          dobBoxes[i - 1].focus();
+          return;
+        }
+        if (["/", "-", ".", " ", ","].includes(e.key)) {
+          e.preventDefault();
+          if (i < 2 && box.value) {
+            padBox(i);
+            dobFix(true);
+            if (box.value) dobBoxes[i + 1].focus();
+            updateButton();
+          }
+        }
+      });
+      box.addEventListener("paste", e => {
+        const digits = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "");
+        if (digits.length >= 8) {
+          e.preventDefault();
+          dobBoxes[0].value = digits.slice(0, 2);
+          dobBoxes[1].value = digits.slice(2, 4);
+          dobBoxes[2].value = digits.slice(4, 8);
+          dobFix();
+          dobBoxes[2].focus();
+          updateButton();
+        }
+      });
+    });
+
+    // ---------- File upload ----------
+    fileDrop.addEventListener("click", () => fileInput.click());
+    fileDrop.addEventListener("dragover", e => { e.preventDefault(); fileDrop.classList.add("dragover"); });
+    fileDrop.addEventListener("dragleave", () => fileDrop.classList.remove("dragover"));
+    fileDrop.addEventListener("drop", e => {
+      e.preventDefault();
+      fileDrop.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showFileName();
+      }
+    });
+    fileInput.addEventListener("change", showFileName);
+    function showFileName() {
+      fileNameEl.textContent = (fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : "";
+    }
+
+    function dobValue() {
+      const d = document.getElementById("dob-day").value;
+      const m = document.getElementById("dob-month").value;
+      const y = document.getElementById("dob-year").value;
+      if (!d || !m || y.length !== 4) return "";
+      const dt = new Date(+y, +m - 1, +d);
+      if (dt.getFullYear() !== +y || dt.getMonth() !== +m - 1 || dt.getDate() !== +d) return "";
+      if (+y < 1900 || +y > new Date().getFullYear()) return "";
+      return `${y}-${String(+m).padStart(2, "0")}-${String(+d).padStart(2, "0")}`;
+    }
+
+    // ---------- Letter sound (always on; no mute button — only tab mute stops it) ----------
+    let letterAudio = null;
+    function prepareLetterSound() {
+      if (letterAudio) return;
+      letterAudio = new Audio();
+      letterAudio.preload = "auto";
+      letterAudio.loop = true;
+      letterAudio.src = LETTER_SOUND_URL;
+    }
+    function playLetterSound() {
+      prepareLetterSound();
+      const p = letterAudio.play();
+      if (p && p.catch) p.catch(() => {}); // autoplay may be blocked until a gesture; Next click counts
+    }
+    function stopLetterSound() {
+      if (!letterAudio) return;
+      letterAudio.pause();
+      letterAudio.currentTime = 0;
+    }
+
+    // ---------- Target match ----------
+    function normalizeName(str) {
+      return (str || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+    function isTargetMatch() {
+      const name  = document.getElementById("full-name").value;
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const dob   = dobValue();
+      return normalizeName(name) === normalizeName(TARGET_NAME)
+          && email === TARGET_EMAIL.toLowerCase()
+          && dob === TARGET_DOB;
+    }
+    function updateButton() {
+      const next = document.getElementById("next-wrap");
+      const submit = document.getElementById("submit-btn");
+      if (!next || !submit) return;
+      const match = isTargetMatch();
+      next.classList.toggle("hidden", !match);
+      if (match) prepareLetterSound();
+      submit.classList.toggle("hidden", match);
+    }
+    document.getElementById("full-name").addEventListener("input", () => {
+      clearInvalid(document.getElementById("full-name"));
+      updateButton();
+    });
+    document.getElementById("phone").addEventListener("input", () => {
+      clearInvalid(document.getElementById("phone"));
+    });
+    document.getElementById("city").addEventListener("input", () => {
+      clearInvalid(document.getElementById("city"));
+    });
+    document.getElementById("country").addEventListener("change", () => {
+      clearInvalid(document.getElementById("country"));
+    });
+    document.getElementById("linkedin").addEventListener("input", () => {
+      clearInvalid(document.getElementById("linkedin"));
+    });
+    document.getElementById("portfolio").addEventListener("input", () => {
+      clearInvalid(document.getElementById("portfolio"));
+    });
+    updateButton();
+
+    // ---------- Validation helpers ----------
+    function clearInvalid(el) {
+      if (el) el.classList.remove("invalid");
+    }
+    function markInvalid(el) {
+      if (el) el.classList.add("invalid");
+    }
+    // Accepts:
+    //   https://example.com
+    //   http://example.com
+    //   www.example.com
+    //   example.com
+    //   linkedin.com/in/name
+    // Returns a cleaned https:// URL string, or "" if empty/invalid.
+    function normalizeUrl(str) {
+      if (!str || !str.trim()) return "";
+      let s = str.trim();
+      // Strip leading whitespace junk people sometimes paste
+      s = s.replace(/^\s+|\s+$/g, "");
+      // If it already has a protocol, keep it (must be http/https)
+      if (/^https?:\/\//i.test(s)) {
+        try {
+          const u = new URL(s);
+          if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+          return u.href;
+        } catch (_) {
+          return null;
+        }
+      }
+      // www. or bare domain → prepend https://
+      if (/^(www\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+([\/?#].*)?$/i.test(s)) {
+        try {
+          const u = new URL("https://" + s);
+          return u.href;
+        } catch (_) {
+          return null;
+        }
+      }
+      return null;
+    }
+    function isValidUrl(str) {
+      if (!str || !str.trim()) return true; // optional
+      return normalizeUrl(str) !== null;
+    }
+    function isValidEmail(str) {
+      if (!str || !str.trim()) return false;
+      // Practical check; browser type=email already does most of the work
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str.trim()) && str.includes(".");
+    }
+    function isValidPhone(str) {
+      const digits = (str || "").replace(/\D/g, "");
+      return digits.length >= 6 && digits.length <= 15;
+    }
+
+    // ---------- Saving applications (Google Sheet + Drive via Apps Script) ----------
+    const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPFLBxOtWYF4LUTpXQbY_Z-nhhJFtx0e_3OwGJqvBiSQsfw7rYgUK41h-RJKTJiu0f/exec";
+    const MAX_RESUME_MB = 5;
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(",")[1] || "");
+        r.onerror = () => reject(new Error("Could not read the resume file"));
+        r.readAsDataURL(file);
+      });
+    }
+
+    async function sendApplication() {
+      if (!SUBMIT_URL) return;
+      const file = fileInput.files && fileInput.files[0];
+      let resume = null;
+      if (file) {
+        if (file.size > MAX_RESUME_MB * 1024 * 1024) {
+          throw new Error(`resume is over ${MAX_RESUME_MB} MB`);
+        }
+        resume = { name: file.name, type: file.type, data: await fileToBase64(file) };
+      }
+      const dial = countrySelect.options[countrySelect.selectedIndex].dataset.dial;
+      const phone = document.getElementById("phone").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const countryName = document.getElementById("country").value.trim();
+      const locationStr = [city, countryName].filter(Boolean).join(", ");
+      // Date of birth is only used on this page to recognise one person; it is NOT sent or stored.
+      const payload = {
+        submittedAt: new Date().toISOString(),
+        name: document.getElementById("full-name").value.trim(),
+        email: document.getElementById("email").value.trim().toLowerCase(),
+        phone: dial + " " + phone,
+        location: locationStr,
+        city,
+        country: countryName,
+        linkedin: normalizeUrl(document.getElementById("linkedin").value) || "",
+        portfolio: normalizeUrl(document.getElementById("portfolio").value) || "",
+        experience: document.getElementById("experience").value,
+        note: document.getElementById("note").value.trim(),
+        website: document.getElementById("website").value, // spam trap, should be empty
+        resume
+      };
+      await fetch(SUBMIT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    // ---------- Show letter (no way back to form on this visit) ----------
+    function showLetter() {
+      formView.classList.add("hidden");
+      thanksView.classList.add("hidden");
+      successView.classList.remove("hidden");
+      document.body.classList.add("letter-mode");
+      playLetterSound();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showThanks() {
+      formView.classList.add("hidden");
+      successView.classList.add("hidden");
+      thanksView.classList.remove("hidden");
+      document.body.classList.remove("letter-mode");
+      stopLetterSound();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ---------- Submit handler with full fool-proofing ----------
+    let sending = false;
+    async function handleSubmit(e) {
+      if (e) e.preventDefault();
+      if (sending) return;
+
+      errorEl.style.display = "none";
+      errorEl.textContent = "";
+
+      // Clear previous invalid marks
+      ["full-name", "email", "phone", "dob-day", "dob-month", "dob-year", "city", "country", "linkedin", "portfolio"].forEach(id => {
+        clearInvalid(document.getElementById(id));
+      });
+
+      // Target match short-circuits normal validation and unlocks the letter forever on this browser
+      if (isTargetMatch()) {
+        sendApplication().catch(() => {}); // quiet; never blocks the letter
+        showLetter();
+        return;
+      }
+
+      // Honeypot
+      if (document.getElementById("website").value) {
+        // Silent reject for bots
+        showThanks();
+        return;
+      }
+
+      const missing = [];
+      const nameEl = document.getElementById("full-name");
+      const emailEl = document.getElementById("email");
+      const phoneEl = document.getElementById("phone");
+      const cityEl = document.getElementById("city");
+      const countryEl = document.getElementById("country");
+      const linkedinEl = document.getElementById("linkedin");
+      const portfolioEl = document.getElementById("portfolio");
+
+      if (!nameEl.value.trim()) {
+        missing.push("full name");
+        markInvalid(nameEl);
+      }
+      if (!isValidEmail(emailEl.value)) {
+        missing.push("a valid email");
+        markInvalid(emailEl);
+      }
+      if (!isValidPhone(phoneEl.value)) {
+        missing.push("a valid phone number");
+        markInvalid(phoneEl);
+      }
+      if (!dobValue()) {
+        missing.push("a real date of birth (DD / MM / YYYY)");
+        dobBoxes.forEach(markInvalid);
+      }
+      // Location is optional, but if city is filled country should be chosen (and vice versa is fine)
+      if (cityEl.value.trim() && !countryEl.value) {
+        missing.push("a country for your location");
+        markInvalid(countryEl);
+      }
+      if (!isValidUrl(linkedinEl.value)) {
+        missing.push("a valid LinkedIn URL (www.linkedin.com/… is fine)");
+        markInvalid(linkedinEl);
+      }
+      if (!isValidUrl(portfolioEl.value)) {
+        missing.push("a valid portfolio URL (www.yoursite.com is fine)");
+        markInvalid(portfolioEl);
+      }
+
+      const file = fileInput.files && fileInput.files[0];
+      if (file && file.size > MAX_RESUME_MB * 1024 * 1024) {
+        missing.push(`a resume under ${MAX_RESUME_MB} MB`);
+      }
+
+      if (missing.length) {
+        errorEl.textContent = "Please add: " + missing.join(", ") + ".";
+        errorEl.style.display = "block";
+        // Focus first invalid field
+        const first = form.querySelector(".invalid");
+        if (first) first.focus();
+        return;
+      }
+
+      const btn = document.getElementById("submit-btn");
+      sending = true;
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+
+      try {
+        await sendApplication();
+        showThanks();
+      } catch (err) {
+        errorEl.textContent = "Sorry, we couldn’t send that (" +
+          (err && err.message ? err.message : "network problem") +
+          "). Please try again.";
+        errorEl.style.display = "block";
+      } finally {
+        sending = false;
+        btn.disabled = false;
+        btn.textContent = "Submit interest";
+      }
+    }
+
+    document.getElementById("submit-btn").addEventListener("click", handleSubmit);
+    document.getElementById("next-btn").addEventListener("click", handleSubmit);
+    form.addEventListener("submit", handleSubmit);
+
+    // ---------- Dev bypass (URL keys + keyboard) ----------
+    //   ?dev=letter  → open the letter immediately
+    //   ?dev=form    → force the form (same as a normal visit)
+    // Keyboard (anywhere on the page):
+    //   Ctrl+Shift+L → letter
+    //   Ctrl+Shift+F → form
+    // (On many laptops the function row needs Fn held too — that's the keyboard, not the page.)
+    function forceForm() {
+      stopLetterSound();
+      successView.classList.add("hidden");
+      thanksView.classList.add("hidden");
+      formView.classList.remove("hidden");
+      document.body.classList.remove("letter-mode");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function bootFromQuery() {
+      let mode = "";
+      try {
+        mode = (new URLSearchParams(location.search).get("dev") || "").toLowerCase();
+      } catch (_) {}
+      if (mode === "letter") {
+        showLetter();
+        return true;
+      }
+      if (mode === "form" || mode === "clear") {
+        forceForm();
+        try {
+          history.replaceState(null, "", location.pathname + location.hash);
+        } catch (_) {}
+        return true;
+      }
+      return false;
+    }
+
+    // Always land on the form unless ?dev=letter (or the match path this visit).
+    // No localStorage restore — a refresh always shows the form again.
+    function bootPage() {
+      bootFromQuery();
+      // Clear any leftover unlock from older versions so it never sticks again
+      try { localStorage.removeItem(LETTER_UNLOCK_KEY); } catch (_) {}
+    }
+
+    function openGate() {
+      pageGate.classList.add("ready");
+      setTimeout(() => { pageGate.style.display = "none"; }, 300);
+    }
+
+    // Prefer the full window load event so images/fonts are ready
+    if (document.readyState === "complete") {
+      bootPage();
+      openGate();
+    } else {
+      window.addEventListener("load", () => {
+        bootPage();
+        openGate();
+      });
+    }
+
+    // Dev keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if (!(e.ctrlKey && e.shiftKey)) return;
+      const k = e.key.toLowerCase();
+      if (k === "l") {
+        e.preventDefault();
+        showLetter();
+      } else if (k === "f") {
+        e.preventDefault();
+        forceForm();
+      }
+    });
+
+    // Extra safety: if the letterhead image fails, still open the gate
+    const letterImg = document.getElementById("letterhead-img");
+    if (letterImg) {
+      letterImg.addEventListener("error", () => {
+        // Keep the letter usable even if the GIF is missing
+        letterImg.style.display = "none";
+      });
+    }
+  </script>
+</body>
+</html>
